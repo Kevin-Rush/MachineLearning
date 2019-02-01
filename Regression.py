@@ -14,30 +14,31 @@ style.use('ggplot')
 df = quandl.get("WIKI/GOOGL", authtoken="xykwYQEpNJg8xpdTbLGH")
 
 #print(df)
-print()
 
 df = df[['Open', 'High', 'Low', 'Close', 'Volume']]
 
 df['HL_PCT'] = (df['High'] - df['Close'])/df['Close']*100       #percent change between the high and the close
 df['PCT_Change'] = (df['Close'] - df['Open'])/df['Open']*100    #percent change between open and close
 
+#objective is to idenfiy what featuers will directly affect price?
+#           price   x           x           x
 df = df[['Close','HL_PCT','PCT_Change','Volume']]               #these will be features
 
 #what is the label? we are trying to predict the price
 
 forcast_col = 'Close'                               #forcast column = the close price
 df.fillna(-99999, inplace=True)                     #can't let there be unfilled data therefore fill empty space with True
-forcast_out = int(math.ceil(0.01*len(df)))          #we are going to try to predict out 10% of the Data Frame
+forcast_out = int(math.ceil(0.1*len(df)))          #we are going to try to predict out 10% of the Data Frame
 
 #print(forcast_out)
 
 df['label'] = df[forcast_col].shift(-forcast_out)   #we are looking at the features to try to predict the Close in '10 days' (actually 10%)
 
-
 X = np.array(df.drop(['label'],1))                  # will define features
 X = preprocessing.scale(X)
-X = X[:-forcast_out]                                # will define leabels
 X_lately = X[-forcast_out:]
+X = X[:-forcast_out]                                # will define leabels
+
 
 #print(X)
 #print(X_lately) 
@@ -62,7 +63,7 @@ accuracy = clf.score(X_test, y_test)
 
 forcast_set = clf.predict(X_lately)         #this is where the prediction is happening 
 
-print(forcast_set, accuracy, forcast_out)
+#print(forcast_set, accuracy, forcast_out)
 
 df['Forcast'] = np.nan
 last_date = df.iloc[-1].name
@@ -75,7 +76,7 @@ for i in forcast_set:
     next_unix += one_day
     df.loc[next_date] = [np.nan for _ in range(len(df.columns) - 1)] + [i] #this is a list of values that are np.nan  + i (i is the forcast) 
 
-print(df.tail())
+#print(df.tail())
 
 df ['Close'].plot() 
 df['Forcast'].plot() 
