@@ -12,6 +12,8 @@ linearregression.pickle
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
+breast-cancer-wisconsin.data.txt
+breast-cancer-wisconsin.names.txt
 
 # Build results
 [Dd]ebug/
